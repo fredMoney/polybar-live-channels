@@ -8,6 +8,9 @@
 # (DONE)return first 3 channels
 # clean this shit up
 import twitch
+import os
+
+CWD = '/home/fredd/Documents/polybar-live-channels/'
 
 def split_channels(channels):
     twitch_channels = []
@@ -24,7 +27,7 @@ def split_channels(channels):
     return twitch_channels, youtube_channels
 
 
-def import_channels(location='channel_list.txt'):
+def import_channels(location=CWD+'channel_list.txt'):
     with open(location, mode='r') as infile:
         channels = infile.read().splitlines()
     SORT_ORDER = {v[1:]:i for i,v in enumerate(channels)}
@@ -37,7 +40,7 @@ def format_channels(channels):
 
 
 def order_channels(channels, SORT_ORDER):
-    ordered = sorted(channels, key=lambda x: SORT_ORDER[x])
+    ordered = sorted(channels, key=lambda x: SORT_ORDER[x.lower()])
     return ordered
 
 
@@ -45,7 +48,7 @@ def order_channels(channels, SORT_ORDER):
 channels, SORT_ORDER = import_channels()
 ttv_c, yt_c = split_channels(channels)
 access_token, expires_in = twitch.get_twitch_access_token()
-with open('tokens.txt', mode='w') as ofile:
+with open(CWD+'tokens.txt', mode='w') as ofile:
     ofile.writelines([access_token, '\n', str(expires_in)])
 live_channels = twitch.get_twitch_streams(access_token, '74wu0uvvktrybwf259qa49r624hzwg', ttv_c)
 sorted_channels = order_channels(live_channels, SORT_ORDER)
