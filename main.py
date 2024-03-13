@@ -24,7 +24,7 @@ def split_channels(channels):
 
 
 def format_channels(channels):
-    message = ''.join(str(channel)+ '󱜠 ' for channel in channels)
+    message = ''.join(str(channel)+ '󱜠 ' for channel in channels[:3])
     return message
 
 # MAIN
