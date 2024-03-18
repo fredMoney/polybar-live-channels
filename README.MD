@@ -1,6 +1,6 @@
 # polybar-live-channels
 
-Shows channels that are live on polybar. Default max is 3. Currently only works for Twitch because their API is nice *(r than YouTube's).*
+Shows Twitch channels that are live on polybar. Default max is 3
 
 ### Requirements:
 
@@ -10,12 +10,11 @@ Shows channels that are live on polybar. Default max is 3. Currently only works 
 
 - Nerd Fonts
 
-
-`channel_list.txt` usage: 
+### `channel_list.txt` usage:
 
     On a new line, insert the identifier ('t' for Twitch, 'y' for YouTube) followed by the channel name (found in the URL). Order matters.
 
-polybar config:  
+### Polybar config:
 
 ```
 # polybar-live-channels
@@ -26,3 +25,9 @@ exec = ~/Documents/polybar-live-channels/print_channels.sh
 tail = true
 interval = 1800
 ```
+
+### Roadmap:
+
+- Use fuzzy search for channel names
+
+- Make it work for YouTube
