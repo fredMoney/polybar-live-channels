@@ -1,5 +1,6 @@
 import twitch
 import math
+import regex
 
 CWD = '/home/fredd/Documents/polybar-live-channels/'
 
@@ -31,17 +32,14 @@ def format_channels(channels):
 
 
 def order_channels(channels, SORT_ORDER):
-    ordered = None
-    try:
-        ordered = sorted(channels, key=lambda x: SORT_ORDER[x])
-    except:
-        ordered = sorted(channels, key=lambda x: SORT_ORDER[x.lower()])
+    ordered = sorted(channels, key=lambda x: SORT_ORDER[x])
     return ordered
 
 
 # MAIN
 POLYBAR_INTERVAL = 600
 access_token = None
+uses = 0
 channels, SORT_ORDER = import_channels()
 ttv_c, yt_c = split_channels(channels)
 
@@ -54,8 +52,6 @@ with open(CWD+'remaining_uses.txt', mode='r') as uses_file:
 if uses < 1 or access_token is None:
     access_token, expires_in = twitch.get_twitch_access_token()
     uses = int(math.floor(expires_in / POLYBAR_INTERVAL))
-    with open(CWD+'remaining_uses.txt', mode='w') as uses_file:
-        uses_file.write(str(uses))
 
 with open(CWD+'tokens.txt', mode='w') as ofile:
     ofile.writelines(access_token)
