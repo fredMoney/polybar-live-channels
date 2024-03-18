@@ -1,14 +1,5 @@
-# (DONE)grab channel list from file
-# (DONE)split list into 2 lists for twitch and youtube
-# call apis and retrieve live channels
-#   twitch DONEEEEEE
-#   youtube
-# merge live channels into 1 list 
-# (DONE)and order based on file orderings
-# (DONE)return first 3 channels
-# clean this shit up
 import twitch
-import os
+import math
 
 CWD = '/home/fredd/Documents/polybar-live-channels/'
 
@@ -40,16 +31,39 @@ def format_channels(channels):
 
 
 def order_channels(channels, SORT_ORDER):
-    ordered = sorted(channels, key=lambda x: SORT_ORDER[x.lower()])
+    ordered = None
+    try:
+        ordered = sorted(channels, key=lambda x: SORT_ORDER[x])
+    except:
+        ordered = sorted(channels, key=lambda x: SORT_ORDER[x.lower()])
     return ordered
 
 
 # MAIN
+POLYBAR_INTERVAL = 600
+access_token = None
 channels, SORT_ORDER = import_channels()
 ttv_c, yt_c = split_channels(channels)
-access_token, expires_in = twitch.get_twitch_access_token()
+
+with open(CWD+'tokens.txt', mode='r') as token_file:
+    access_token = token_file.read()
+
+with open(CWD+'remaining_uses.txt', mode='r') as uses_file:
+    uses = int(uses_file.read())
+
+if uses < 1 or access_token is None:
+    access_token, expires_in = twitch.get_twitch_access_token()
+    uses = int(math.floor(expires_in / POLYBAR_INTERVAL))
+    with open(CWD+'remaining_uses.txt', mode='w') as uses_file:
+        uses_file.write(str(uses))
+
 with open(CWD+'tokens.txt', mode='w') as ofile:
-    ofile.writelines([access_token, '\n', str(expires_in)])
-live_channels = twitch.get_twitch_streams(access_token, '74wu0uvvktrybwf259qa49r624hzwg', ttv_c)
+    ofile.writelines(access_token)
+live_channels = twitch.get_twitch_streams(access_token, ttv_c)
+uses = uses - 1
+
+with open(CWD+'remaining_uses.txt', mode='w') as uses_file:
+    uses_file.write(str(uses))
+
 sorted_channels = order_channels(live_channels, SORT_ORDER)
 print(format_channels(sorted_channels))
