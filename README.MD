@@ -1,6 +1,8 @@
 # polybar-live-channels
 
-Shows Twitch channels that are live on polybar. Default max is 3
+Shows Twitch channels that are live on polybar. Default max is 3.
+You NEED a Twitch API key for this to work!
+Put your Twitch API stuff in twitch_credentials.json
 
 ### Requirements:
 
