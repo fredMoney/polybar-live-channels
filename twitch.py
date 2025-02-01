@@ -1,5 +1,5 @@
 import requests
-import ast
+from ast import literal_eval
 from abc import abstractmethod
 
 CWD = '/home/fredd/Documents/polybar-live-channels/'
@@ -15,7 +15,7 @@ class TwitchQuery():
 
     def get_credentials(self):
         with open(CWD+'twitch_credentials.json', mode='r') as infile:
-            self.credentials = ast.literal_eval(infile.read())
+            self.credentials = literal_eval(infile.read())
 
     def get_twitch_access_token(self):
         request_url = 'https://id.twitch.tv/oauth2/token'
@@ -57,3 +57,25 @@ class TwitchQueryNameInterval(TwitchQuery):
             self.info.append(r['user_name'])
 
         self.info = sorted(self.info, key=lambda channel: self.sort_order[channel])
+
+class TwitchQueryMore(TwitchQuery):
+    def __init__(self):
+        super().__init__()
+
+    def get_info(self):
+        client_id = str(self.credentials['client_id'])
+        REQUEST_URL = 'https://api.twitch.tv/helix/streams'
+        headers = {
+                    "Authorization": "Bearer {0}".format(self.access_token),
+                    "Client-Id": client_id,
+                  }
+        payload = {
+                    "user_login": [str(channel) for channel in self.channels_to_query],
+                    "type": "live",
+                  }
+        response = requests.get(REQUEST_URL, headers=headers, params=payload)
+        for r in response.json()['data']:
+            self.info.append([r['user_name'], r['title'], r['game_name']])
+
+        self.info = sorted(self.info, key=lambda channel: self.sort_order[channel])
+
